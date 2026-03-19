@@ -1,0 +1,15 @@
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.AssemblyInfoInputs.cache
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.AssemblyInfo.cs
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.csproj.CoreCompileInputs.cache
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.sourcelink.json
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\bin\Debug\net8.0\HundirLaFlota.exe
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\bin\Debug\net8.0\HundirLaFlota.deps.json
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\bin\Debug\net8.0\HundirLaFlota.runtimeconfig.json
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\bin\Debug\net8.0\HundirLaFlota.dll
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\bin\Debug\net8.0\HundirLaFlota.pdb
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.dll
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\refint\HundirLaFlota.dll
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.pdb
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\HundirLaFlota.genruntimeconfig.cache
+C:\Users\HP\Documents\DAW 2N\PROGRAMACIÓ\HundirLaFlota\HundirLaFlota-Sana\obj\Debug\net8.0\ref\HundirLaFlota.dll

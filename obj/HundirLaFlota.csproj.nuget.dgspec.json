@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota.csproj": {}
+    "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota-Sana\\HundirLaFlota.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota.csproj": {
+    "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota-Sana\\HundirLaFlota.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota-Sana\\HundirLaFlota.csproj",
         "projectName": "HundirLaFlota",
-        "projectPath": "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota.csproj",
+        "projectPath": "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota-Sana\\HundirLaFlota.csproj",
         "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\obj\\",
+        "outputPath": "C:\\Users\\HP\\Documents\\DAW 2N\\PROGRAMACIÓ\\HundirLaFlota\\HundirLaFlota-Sana\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config"
