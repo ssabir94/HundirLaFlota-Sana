@@ -1,6 +1,6 @@
 # HundirLaFlota-Sana
 
-<<<<<<< HEAD
+
 ## Descripción del proyecto
 
 Hundir la Flota es un juego de estrategia por turnos desarrollado como una aplicación de consola en C#.  
@@ -89,5 +89,3 @@ dotnet run
 
 El programa mostrará un mensaje de prueba indicando que el proyecto se ha iniciado correctamente.
 =======
-<img width="6268" height="5084" alt="image" src="https://github.com/user-attachments/assets/716e4734-55db-41c4-a232-07ac5e853c32" />
->>>>>>> c825e7ca81aea896e4bcfce4f1548c0223504c39
