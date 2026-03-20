@@ -1,31 +1,48 @@
 using HundirLaFlota.Dominio;
-using HundirLaFlota.Motor;
 
 namespace HundirLaFlota.Presentacion;
 
 public class Renderizador
 {
-    public void MostrarBienvenida() { }
-
-    public void MostrarTablerosBatalla(Tablero propio, Tablero enemigo) { }
-
-    public void MostrarTableroColocacion(Tablero tablero, Barco barco) { }
-
-    public string PedirCoordenada()
+    public void MostrarTablero(Tablero tablero)
     {
-        return "";
+        // Números columna
+        Console.Write("  ");
+        for (int i = 1; i <= 10; i++)
+        {
+            Console.Write(i + " ");
+        }
+        Console.WriteLine();
+
+        // Files A-J
+        for (int fila = 0; fila < 10; fila++)
+        {
+            char letra = (char)('A' + fila);
+            Console.Write(letra + " ");
+
+            for (int columna = 0; columna < 10; columna++)
+            {
+                Casilla casilla = tablero.ObtenerCasilla(fila, columna);
+
+                char simbolo = '.';
+
+                if (casilla.Disparada)
+                {
+                    if (casilla.Barco == null)
+                        simbolo = '~';
+                    else
+                        simbolo = 'X';
+                }
+                else
+                {
+                    if (casilla.Barco != null)
+                        simbolo = 'S';
+                }
+
+                Console.Write(simbolo + " ");
+            }
+
+            Console.WriteLine();
+        }
     }
-
-    public string PedirPosicion(Barco barco)
-    {
-        return "";
-    }
-
-    public void MostrarResultadoDisparo(ResultadoDisparo resultado, int fila, int columna) { }
-
-    public void MostrarDisparoCpu(ResultadoDisparo resultado, int fila, int columna) { }
-
-    public void MostrarResultadoFinal(bool ganaJugador, Jugador jugador) { }
-
-    public void MostrarError(string mensaje) { }
 }

@@ -16,5 +16,7 @@ public class Casilla
     {
         Fila = fila;
         Columna = columna;
+        Barco = null;
+        Disparada = false;
     }
 }
