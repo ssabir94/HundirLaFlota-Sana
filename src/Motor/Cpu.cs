@@ -83,4 +83,10 @@ public class Cpu : Jugador
 
         return objetivo;
     }
+
+    public void EliminarObjetivoUsado(int fila, int columna)
+{
+    objetivos.Remove((fila, columna));
+}
+
 }

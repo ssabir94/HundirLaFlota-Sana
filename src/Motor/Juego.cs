@@ -1,75 +1,60 @@
+using HundirLaFlota.Datos;
 using HundirLaFlota.Dominio;
 using HundirLaFlota.Presentacion;
-using HundirLaFlota.Datos;
 
 namespace HundirLaFlota.Motor;
 
 public class Juego
 {
-    // Definir fases internas del juego
     private enum Fase
     {
         Colocacion,
         Batalla,
-        Terminado
+        Terminado,
     }
 
-    // Guardar jugador humano
     private Jugador jugador;
-
-    // Guardar CPU
     private Cpu cpu;
-
-    // Guardar renderizador
     private Renderizador renderizador;
-
-    // Guardar gestor de guardado
     private GestorGuardado gestorGuardado;
-
-    // Guardar fase actual
     private Fase faseActual;
 
-    // Inicializar juego
     public Juego()
     {
-        // Crear jugador
         jugador = new Jugador("Jugador");
-
-        // Crear CPU
         cpu = new Cpu("CPU");
-
-        // Crear renderizador
         renderizador = new Renderizador();
-
-        // Crear gestor de guardado
         gestorGuardado = new GestorGuardado();
-
-        // Inicializar fase
         faseActual = Fase.Colocacion;
     }
 
-    // Iniciar partida
     public void Iniciar()
     {
-        // Mostrar bienvenida
         renderizador.MostrarBienvenida();
 
-        // Preparar flota del jugador
-        List<Barco> flotaJugador = Flota.CrearFlota();
+        if (gestorGuardado.ExistePartidaGuardada)
+        {
+            Console.Write("¿Quieres continuar la partida guardada? (S/N): ");
+            string? respuesta = Console.ReadLine();
 
-        // Preparar flota de la CPU
-        List<Barco> flotaCpu = Flota.CrearFlota();
+            if (!string.IsNullOrWhiteSpace(respuesta) && respuesta.Trim().ToUpper() == "S")
+            {
+                CargarPartida();
+            }
+        }
 
-        // Colocar flota del jugador
-        ColocarFlotaJugador(flotaJugador);
+        if (faseActual == Fase.Colocacion)
+        {
+            List<Barco> flotaJugador = Flota.CrearFlota();
+            List<Barco> flotaCpu = Flota.CrearFlota();
 
-        // Colocar flota de la CPU
-        cpu.ColocarFlotaAleatoria(flotaCpu);
+            ColocarFlotaJugador(flotaJugador);
+            cpu.ColocarFlotaAleatoria(flotaCpu);
 
-        // Cambiar a fase de batalla
-        faseActual = Fase.Batalla;
+            faseActual = Fase.Batalla;
+            GuardarPartida("Jugador");
+        }
 
-        // Ejecutar batalla
         while (!HayGanador())
         {
             TurnoJugador();
@@ -82,40 +67,30 @@ public class Juego
             TurnoCpu();
         }
 
-        // Cambiar a fase terminada
         faseActual = Fase.Terminado;
-
-        // Mostrar resultado final
         MostrarResultadoFinal();
     }
 
-    // Colocar flota del jugador
     private void ColocarFlotaJugador(List<Barco> flota)
     {
-        // Recorrer barcos de la flota
         foreach (Barco barco in flota)
         {
             bool colocado = false;
 
-            // Repetir hasta colocar correctamente
             while (!colocado)
             {
-                // Pedir fila
+                renderizador.MostrarTableroColocacion(jugador.Tablero, barco);
+
                 Console.Write("Introduce fila para " + barco.Nombre + " (0-9): ");
                 string? textoFila = Console.ReadLine();
 
-                // Pedir columna
                 Console.Write("Introduce columna para " + barco.Nombre + " (0-9): ");
                 string? textoColumna = Console.ReadLine();
 
-                // Pedir orientación
                 Console.Write("Introduce orientación (H/V): ");
                 string? textoOrientacion = Console.ReadLine();
 
-                // Validar fila
                 bool filaValida = int.TryParse(textoFila, out int fila);
-
-                // Validar columna
                 bool columnaValida = int.TryParse(textoColumna, out int columna);
 
                 if (!filaValida || !columnaValida)
@@ -124,16 +99,21 @@ public class Juego
                     continue;
                 }
 
-                // Validar orientación
-                bool esHorizontal = true;
+                if (fila < 0 || fila > 9 || columna < 0 || columna > 9)
+                {
+                    renderizador.MostrarError("Posición fuera del tablero.");
+                    continue;
+                }
 
-                if (textoOrientacion == null)
+                if (string.IsNullOrWhiteSpace(textoOrientacion))
                 {
                     renderizador.MostrarError("Orientación no válida.");
                     continue;
                 }
 
-                textoOrientacion = textoOrientacion.ToUpper();
+                textoOrientacion = textoOrientacion.Trim().ToUpper();
+
+                bool esHorizontal;
 
                 if (textoOrientacion == "H")
                 {
@@ -149,36 +129,31 @@ public class Juego
                     continue;
                 }
 
-                // Comprobar colocación
-                if (jugador.Tablero.PuedeColocar(barco, fila, columna, esHorizontal))
-                {
-                    jugador.Tablero.ColocarBarco(barco, fila, columna, esHorizontal);
-                    colocado = true;
-                }
-                else
+                if (!jugador.Tablero.PuedeColocar(barco, fila, columna, esHorizontal))
                 {
                     renderizador.MostrarError("No se puede colocar el barco en esa posición.");
+                    continue;
                 }
+
+                jugador.Tablero.ColocarBarco(barco, fila, columna, esHorizontal);
+                colocado = true;
             }
         }
     }
 
-    // Ejecutar turno del jugador
     private void TurnoJugador()
     {
-        bool turnoValido = false;
-
-        // Repetir hasta hacer disparo válido
-        while (!turnoValido)
+        while (true)
         {
-            // Mostrar tableros de batalla
-            renderizador.MostrarTablerosBatalla(jugador.Tablero, cpu.Tablero);
+            renderizador.MostrarTablerosBatalla(jugador.Tablero, cpu.Tablero, jugador);
 
-            // Pedir coordenada
             string coordenada = renderizador.PedirCoordenada();
 
-            // Convertir coordenada a fila y columna
-            bool conversionCorrecta = ConvertirCoordenada(coordenada, out int fila, out int columna);
+            bool conversionCorrecta = ConvertirCoordenada(
+                coordenada,
+                out int fila,
+                out int columna
+            );
 
             if (!conversionCorrecta)
             {
@@ -186,52 +161,42 @@ public class Juego
                 continue;
             }
 
-            // Registrar disparo sobre tablero enemigo
             ResultadoDisparo resultado = cpu.Tablero.Disparar(fila, columna);
 
-            // Comprobar disparo repetido
             if (resultado == ResultadoDisparo.YaDisparado)
             {
                 renderizador.MostrarError("Esa casilla ya ha sido atacada.");
                 continue;
             }
 
-            // Registrar estadísticas del jugador
             jugador.RegistrarDisparo(resultado);
-
-            // Mostrar resultado del disparo
             renderizador.MostrarResultadoDisparo(resultado, fila, columna);
 
-            turnoValido = true;
+            GuardarPartida("Cpu");
+
+            break; // 🔥 CLAVE → sale del bucle SIEMPRE aquí
         }
     }
 
-    // Ejecutar turno de la CPU
     private void TurnoCpu()
     {
-        // Elegir objetivo automático
         (int fila, int columna) objetivo = cpu.ElegirObjetivo();
 
-        // Disparar sobre tablero del jugador
         ResultadoDisparo resultado = jugador.Tablero.Disparar(objetivo.fila, objetivo.columna);
 
-        // Registrar estadísticas de la CPU
         cpu.RegistrarDisparo(resultado);
-
-        // Mostrar disparo de la CPU
         renderizador.MostrarDisparoCpu(resultado, objetivo.fila, objetivo.columna);
+
+        GuardarPartida("Jugador");
     }
 
-    // Comprobar si hay ganador
     public bool HayGanador()
     {
-        // Comprobar derrota del jugador
         if (jugador.Tablero.TodosHundidos)
         {
             return true;
         }
 
-        // Comprobar derrota de la CPU
         if (cpu.Tablero.TodosHundidos)
         {
             return true;
@@ -240,22 +205,179 @@ public class Juego
         return false;
     }
 
-    // Mostrar resultado final
     private void MostrarResultadoFinal()
     {
-        // Comprobar victoria del jugador
         bool ganaJugador = cpu.Tablero.TodosHundidos;
-
         renderizador.MostrarResultadoFinal(ganaJugador, jugador);
+        gestorGuardado.EliminarGuardado();
     }
 
-    // Convertir coordenada tipo B7 a fila y columna
+    private void GuardarPartida(string turnoActual)
+    {
+        EstadoPartida estado = new EstadoPartida();
+
+        estado.NombreJugador = jugador.Nombre;
+        estado.FaseActual = faseActual.ToString();
+        estado.TurnoActual = turnoActual;
+
+        estado.DisparosJugador = jugador.Disparos;
+        estado.AciertosJugador = jugador.Aciertos;
+        estado.FallosJugador = jugador.Fallos;
+
+        estado.DisparosCpu = cpu.Disparos;
+        estado.AciertosCpu = cpu.Aciertos;
+        estado.FallosCpu = cpu.Fallos;
+
+        estado.BarcosJugador = ObtenerBarcosGuardados(jugador.Tablero);
+        estado.BarcosCpu = ObtenerBarcosGuardados(cpu.Tablero);
+
+        estado.DisparosTableroJugador = ObtenerDisparosGuardados(jugador.Tablero);
+        estado.DisparosTableroCpu = ObtenerDisparosGuardados(cpu.Tablero);
+
+        gestorGuardado.Guardar(estado);
+    }
+
+    private void CargarPartida()
+    {
+        EstadoPartida? estado = gestorGuardado.Cargar();
+
+        if (estado == null)
+        {
+            renderizador.MostrarError("No se pudo cargar la partida.");
+            return;
+        }
+
+        jugador = new Jugador(estado.NombreJugador);
+        cpu = new Cpu("CPU");
+
+        jugador.Disparos = estado.DisparosJugador;
+        jugador.Aciertos = estado.AciertosJugador;
+        jugador.Fallos = estado.FallosJugador;
+
+        cpu.Disparos = estado.DisparosCpu;
+        cpu.Aciertos = estado.AciertosCpu;
+        cpu.Fallos = estado.FallosCpu;
+
+        if (estado.FaseActual == "Batalla")
+        {
+            faseActual = Fase.Batalla;
+        }
+        else if (estado.FaseActual == "Terminado")
+        {
+            faseActual = Fase.Terminado;
+        }
+        else
+        {
+            faseActual = Fase.Colocacion;
+        }
+
+        CargarBarcosEnTablero(jugador.Tablero, estado.BarcosJugador);
+        CargarBarcosEnTablero(cpu.Tablero, estado.BarcosCpu);
+
+        CargarDisparosEnTablero(jugador.Tablero, estado.DisparosTableroJugador);
+        CargarDisparosEnTablero(cpu.Tablero, estado.DisparosTableroCpu);
+
+        foreach (CasillaDisparadaGuardada disparo in estado.DisparosTableroJugador)
+        {
+            cpu.EliminarObjetivoUsado(disparo.Fila, disparo.Columna);
+        }
+    }
+
+    private List<BarcoGuardado> ObtenerBarcosGuardados(Tablero tablero)
+    {
+        List<BarcoGuardado> resultado = new List<BarcoGuardado>();
+        List<Barco> barcosYaGuardados = new List<Barco>();
+
+        for (int fila = 0; fila < 10; fila++)
+        {
+            for (int columna = 0; columna < 10; columna++)
+            {
+                Casilla casilla = tablero.ObtenerCasilla(fila, columna);
+
+                if (casilla.Barco != null && !barcosYaGuardados.Contains(casilla.Barco))
+                {
+                    Barco barco = casilla.Barco;
+                    barcosYaGuardados.Add(barco);
+
+                    BarcoGuardado barcoGuardado = new BarcoGuardado();
+                    barcoGuardado.Nombre = barco.Nombre;
+                    barcoGuardado.Tamanio = barco.Tamanio;
+                    barcoGuardado.Impactos = barco.Impactos;
+
+                    foreach (Casilla c in barco.Casillas)
+                    {
+                        CoordenadaGuardada coordenada = new CoordenadaGuardada();
+                        coordenada.Fila = c.Fila;
+                        coordenada.Columna = c.Columna;
+                        barcoGuardado.Coordenadas.Add(coordenada);
+                    }
+
+                    resultado.Add(barcoGuardado);
+                }
+            }
+        }
+
+        return resultado;
+    }
+
+    private List<CasillaDisparadaGuardada> ObtenerDisparosGuardados(Tablero tablero)
+    {
+        List<CasillaDisparadaGuardada> resultado = new List<CasillaDisparadaGuardada>();
+
+        for (int fila = 0; fila < 10; fila++)
+        {
+            for (int columna = 0; columna < 10; columna++)
+            {
+                Casilla casilla = tablero.ObtenerCasilla(fila, columna);
+
+                if (casilla.Disparada)
+                {
+                    CasillaDisparadaGuardada disparo = new CasillaDisparadaGuardada();
+                    disparo.Fila = fila;
+                    disparo.Columna = columna;
+                    disparo.TeniaBarco = casilla.Barco != null;
+                    resultado.Add(disparo);
+                }
+            }
+        }
+
+        return resultado;
+    }
+
+    private void CargarBarcosEnTablero(Tablero tablero, List<BarcoGuardado> barcosGuardados)
+    {
+        foreach (BarcoGuardado barcoGuardado in barcosGuardados)
+        {
+            Barco barco = new Barco(barcoGuardado.Nombre, barcoGuardado.Tamanio);
+
+            foreach (CoordenadaGuardada coordenada in barcoGuardado.Coordenadas)
+            {
+                tablero.AsignarBarcoEnCasilla(coordenada.Fila, coordenada.Columna, barco);
+            }
+
+            for (int i = 0; i < barcoGuardado.Impactos; i++)
+            {
+                barco.RecibirImpacto();
+            }
+        }
+    }
+
+    private void CargarDisparosEnTablero(
+        Tablero tablero,
+        List<CasillaDisparadaGuardada> disparosGuardados
+    )
+    {
+        foreach (CasillaDisparadaGuardada disparo in disparosGuardados)
+        {
+            tablero.MarcarCasillaDisparada(disparo.Fila, disparo.Columna);
+        }
+    }
+
     private bool ConvertirCoordenada(string coordenada, out int fila, out int columna)
     {
         fila = -1;
         columna = -1;
 
-        // Comprobar nulo o vacío
         if (string.IsNullOrWhiteSpace(coordenada))
         {
             return false;
@@ -263,24 +385,19 @@ public class Juego
 
         coordenada = coordenada.Trim().ToUpper();
 
-        // Comprobar longitud
         if (coordenada.Length < 2 || coordenada.Length > 3)
         {
             return false;
         }
 
-        // Convertir letra a fila
         fila = coordenada[0] - 'A';
 
-        // Validar fila
         if (fila < 0 || fila > 9)
         {
             return false;
         }
 
-        // Convertir parte numérica a columna
         string parteNumero = coordenada.Substring(1);
-
         bool numeroValido = int.TryParse(parteNumero, out int columnaHumana);
 
         if (!numeroValido)
@@ -290,7 +407,6 @@ public class Juego
 
         columna = columnaHumana - 1;
 
-        // Validar columna
         if (columna < 0 || columna > 9)
         {
             return false;
