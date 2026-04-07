@@ -5,198 +5,420 @@ namespace HundirLaFlota.Presentacion;
 
 public class Renderizador
 {
-    // Mostrar pantalla de bienvenida
     public void MostrarBienvenida()
     {
-        Console.WriteLine("==================================");
-        Console.WriteLine("        HUNDIR LA FLOTA");
-        Console.WriteLine("==================================");
+        EscribirColor(ArteAscii.LogoPrincipal, Colores.Titulo);
         Console.WriteLine();
     }
 
-    // Mostrar los dos tableros de batalla
     public void MostrarTablerosBatalla(Tablero propio, Tablero enemigo, Jugador jugador)
     {
         string[] letras = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+        int barcosHundidos = 5 - enemigo.BarcosRestantes;
 
-        Console.WriteLine();
-        Console.WriteLine("TU TABLERO".PadRight(38) + "MAR ENEMIGO");
-        Console.Write("    ");
-
-        for (int c = 1; c <= 10; c++)
-        {
-            Console.Write($"{c,2} ");
-        }
-
-        Console.Write("      ");
-
-        for (int c = 1; c <= 10; c++)
-        {
-            Console.Write($"{c,2} ");
-        }
-
-        Console.WriteLine();
+        EscribirColor(ArteAscii.MarcoBatallaSuperior, Colores.Titulo);
+        Console.WriteLine(
+            "║      TU TABLERO                           MAR ENEMIGO                      ║"
+        );
+        Console.WriteLine(
+            "║        1  2  3  4  5  6  7  8  9 10      1  2  3  4  5  6  7  8  9 10      ║"
+        );
 
         for (int f = 0; f < 10; f++)
         {
-            Console.Write($"{letras[f]}   ");
+            Console.Write("║   " + letras[f] + "   ");
 
             for (int c = 0; c < 10; c++)
             {
                 ImprimirCasilla(propio.ObtenerCasilla(f, c), true);
             }
 
-            Console.Write("    ");
-            Console.Write($"{letras[f]}   ");
+            Console.Write("  " + letras[f] + "   ");
 
             for (int c = 0; c < 10; c++)
             {
                 ImprimirCasilla(enemigo.ObtenerCasilla(f, c), false);
             }
 
-            Console.WriteLine();
+            Console.WriteLine("   ║");
         }
 
-        Console.WriteLine();
-        Console.WriteLine("[ S = barco propio   X = impacto   ~ = agua   . = vacío   # = hundido ]");
-        Console.WriteLine();
-        Console.WriteLine("Disparos: " + jugador.Disparos +
-                          "   Aciertos: " + jugador.Aciertos +
-                          "   Fallos: " + jugador.Fallos +
-                          "   Precisión: " + jugador.Precision.ToString("F2") + "%");
-        Console.WriteLine("Barcos propios restantes: " + propio.BarcosRestantes +
-                          "   Barcos enemigos restantes: " + enemigo.BarcosRestantes);
+        EscribirColor(ArteAscii.MarcoBatallaEstadisticas, Colores.Titulo);
+
+        string linea1 =
+            "║  Disparos: "
+            + jugador.Disparos
+            + "   Aciertos: "
+            + jugador.Aciertos
+            + "   Fallos: "
+            + jugador.Fallos
+            + "   Precisión: "
+            + jugador.Precision.ToString("F1")
+            + " %";
+
+        string linea2 =
+            "║  Barcos hundidos: "
+            + barcosHundidos
+            + " / 5"
+            + "       Barcos enemigos restantes: "
+            + enemigo.BarcosRestantes;
+
+        Console.WriteLine(AjustarLineaMarco(linea1));
+        Console.WriteLine(AjustarLineaMarco(linea2));
+
+        EscribirColor(ArteAscii.MarcoBatallaInferior, Colores.Titulo);
+        Console.Write("  [ ");
+        EscribirColorInline("S", Colores.BarcoPropio);
+        Console.Write(" = barco propio   ");
+        EscribirColorInline("X", Colores.Impacto);
+        Console.Write(" = impacto   ");
+        EscribirColorInline("~", Colores.Agua);
+        Console.Write(" = agua   ");
+        EscribirColorInline(".", Colores.CasillaVacia);
+        Console.Write(" = vacío   ");
+        EscribirColorInline("#", Colores.Hundido);
+        Console.WriteLine(" = hundido ]");
         Console.WriteLine();
     }
 
-    // Mostrar tablero durante la colocación
-    public void MostrarTableroColocacion(Tablero tablero, Barco barco)
+    public void MostrarTableroColocacion(
+        Tablero tablero,
+        Barco barco,
+        int filaPreview,
+        int columnaPreview,
+        bool horizontal
+    )
     {
         string[] letras = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+        bool posicionValida = false;
 
-        Console.WriteLine();
-
-        Console.WriteLine("Coloca tu " + barco.Nombre + " (" + barco.Tamanio + " casillas)");
-        Console.WriteLine();
-
-        Console.Write("    ");
-        for (int c = 1; c <= 10; c++)
+        if (filaPreview >= 0 && columnaPreview >= 0)
         {
-            Console.Write($"{c,2} ");
+            posicionValida = tablero.PuedeColocar(barco, filaPreview, columnaPreview, horizontal);
         }
-        Console.WriteLine();
+
+        EscribirColor(ArteAscii.MarcoColocacionSuperior, Colores.Titulo);
+        Console.WriteLine(
+            "║  Coloca tu "
+                + AjustarTextoColocacion(barco.Nombre + " (" + barco.Tamanio + " casillas)", 29)
+                + "║"
+        );
+        Console.WriteLine("║  H = horizontal   V = vertical               ║");
+        EscribirColor(ArteAscii.MarcoColocacionMedio, Colores.Titulo);
+        Console.WriteLine("║        1  2  3  4  5  6  7  8  9 10          ║");
 
         for (int f = 0; f < 10; f++)
         {
-            Console.Write($"{letras[f]}   ");
+            Console.Write("║   " + letras[f] + "   ");
 
             for (int c = 0; c < 10; c++)
             {
-                ImprimirCasilla(tablero.ObtenerCasilla(f, c), true);
+                bool esPreview = EsCasillaPreview(
+                    f,
+                    c,
+                    filaPreview,
+                    columnaPreview,
+                    barco.Tamanio,
+                    horizontal
+                );
+
+                if (esPreview)
+                {
+                    if (posicionValida)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+
+                    Console.Write($"{"?", 2} ");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    ImprimirCasilla(tablero.ObtenerCasilla(f, c), true);
+                }
             }
 
-            Console.WriteLine();
+            Console.WriteLine("║");
+        }
+
+        EscribirColor(ArteAscii.MarcoColocacionInferior, Colores.Titulo);
+        Console.WriteLine();
+        Console.Write("? = posición provisional");
+
+        if (posicionValida)
+        {
+            Console.Write("  ");
+            EscribirColor("Válida", ConsoleColor.Green);
+        }
+        else
+        {
+            Console.Write("  ");
+            EscribirColor("No válida", ConsoleColor.Red);
         }
 
         Console.WriteLine();
     }
 
-    // Pedir coordenada de disparo
     public string PedirCoordenada()
     {
-        Console.Write("Coordenada (ej. B7): ");
-        string? entrada = Console.ReadLine();
-
-        if (entrada == null)
+        while (true)
         {
-            return "";
-        }
+            Console.Write("Coordenada (ej. B7): ");
+            string? entrada = Console.ReadLine();
 
-        return entrada.Trim().ToUpper();
+            if (entrada == null)
+            {
+                MostrarError("Entrada no válida.");
+                continue;
+            }
+
+            entrada = entrada.Trim().ToUpper();
+
+            if (EsCoordenadaValida(entrada))
+            {
+                return entrada;
+            }
+
+            MostrarError("Coordenada no válida. Usa formato A1-J10.");
+        }
     }
 
-    // Mostrar resultado del disparo del jugador
+    private bool EsCoordenadaValida(string texto)
+    {
+        if (texto.Length < 2 || texto.Length > 3)
+        {
+            return false;
+        }
+
+        char letra = texto[0];
+
+        if (letra < 'A' || letra > 'J')
+        {
+            return false;
+        }
+
+        string numeroTexto = texto.Substring(1);
+
+        if (!int.TryParse(numeroTexto, out int numero))
+        {
+            return false;
+        }
+
+        return numero >= 1 && numero <= 10;
+    }
+
     public void MostrarResultadoDisparo(ResultadoDisparo resultado, int fila, int columna)
     {
         string coordenada = ConvertirACoordenadaHumana(fila, columna);
 
         if (resultado == ResultadoDisparo.Agua)
-            Console.WriteLine("Disparo en " + coordenada + ": Agua");
+        {
+            Console.Write("Disparo en " + coordenada + ": ");
+            EscribirColor("Agua", Colores.Agua);
+        }
         else if (resultado == ResultadoDisparo.Impacto)
-            Console.WriteLine("Disparo en " + coordenada + ": Impacto");
+        {
+            Console.Write("Disparo en " + coordenada + ": ");
+            EscribirColor("Impacto", Colores.Impacto);
+        }
         else if (resultado == ResultadoDisparo.Hundido)
-            Console.WriteLine("Disparo en " + coordenada + ": Hundido");
+        {
+            Console.Write("Disparo en " + coordenada + ": ");
+            EscribirColor("Hundido", Colores.Hundido);
+        }
         else
+        {
             Console.WriteLine("Disparo en " + coordenada + ": Ya disparado");
+        }
     }
 
-    // Mostrar resultado del disparo de la CPU
     public void MostrarDisparoCpu(ResultadoDisparo resultado, int fila, int columna)
     {
         string coordenada = ConvertirACoordenadaHumana(fila, columna);
 
         if (resultado == ResultadoDisparo.Agua)
-            Console.WriteLine("La CPU dispara en " + coordenada + ": Agua");
+        {
+            Console.Write("La CPU dispara en " + coordenada + ": ");
+            EscribirColor("Agua", Colores.Agua);
+        }
         else if (resultado == ResultadoDisparo.Impacto)
-            Console.WriteLine("La CPU dispara en " + coordenada + ": Impacto");
+        {
+            Console.Write("La CPU dispara en " + coordenada + ": ");
+            EscribirColor("Impacto", Colores.Impacto);
+        }
         else if (resultado == ResultadoDisparo.Hundido)
-            Console.WriteLine("La CPU dispara en " + coordenada + ": Hundido");
+        {
+            Console.Write("La CPU dispara en " + coordenada + ": ");
+            EscribirColor("Hundido", Colores.Hundido);
+        }
         else
+        {
             Console.WriteLine("La CPU dispara en " + coordenada + ": Ya disparado");
+        }
     }
 
-    // Mostrar resultado final de la partida
     public void MostrarResultadoFinal(bool ganaJugador, Jugador jugador)
     {
         Console.WriteLine();
-        Console.WriteLine("=== FINAL DE PARTIDA ===");
 
         if (ganaJugador)
-            Console.WriteLine("¡Has ganado!");
+        {
+            EscribirColor(ArteAscii.Victoria, Colores.Exito);
+        }
         else
-            Console.WriteLine("¡Has perdido!");
+        {
+            EscribirColor(ArteAscii.Derrota, Colores.Error);
+        }
 
-        Console.WriteLine("Disparos: " + jugador.Disparos);
-        Console.WriteLine("Aciertos: " + jugador.Aciertos);
-        Console.WriteLine("Fallos: " + jugador.Fallos);
-        Console.WriteLine("Precisión: " + jugador.Precision.ToString("F2") + "%");
+        Console.WriteLine("║  Disparos: " + AjustarNumero(jugador.Disparos, 25) + "║");
+        Console.WriteLine("║  Aciertos: " + AjustarNumero(jugador.Aciertos, 25) + "║");
+        Console.WriteLine("║  Fallos: " + AjustarNumero(jugador.Fallos, 27) + "║");
+        Console.WriteLine(
+            "║  Precisión: "
+                + AjustarTextoDerecha(jugador.Precision.ToString("F2") + " %", 24)
+                + "║"
+        );
+        EscribirColor(ArteAscii.MarcoFinalInferior, ganaJugador ? Colores.Exito : Colores.Error);
+        Console.WriteLine();
     }
 
-    // Mostrar mensaje de error
     public void MostrarError(string mensaje)
     {
+        Console.ForegroundColor = Colores.Error;
         Console.WriteLine("Error: " + mensaje);
+        Console.ResetColor();
     }
 
-    // Imprimir una casilla con ancho fijo
     private void ImprimirCasilla(Casilla casilla, bool esPropio)
     {
-        string simbolo = ".";
+        string simbolo;
+        ConsoleColor color;
 
         if (casilla.EsImpacto)
         {
             if (casilla.Barco != null && casilla.Barco.EstaHundido)
+            {
                 simbolo = "#";
+                color = Colores.Hundido;
+            }
             else
+            {
                 simbolo = "X";
+                color = Colores.Impacto;
+            }
         }
         else if (casilla.EsAgua)
         {
             simbolo = "~";
+            color = Colores.Agua;
         }
         else if (!casilla.EstaVacia && esPropio)
         {
             simbolo = "S";
+            color = Colores.BarcoPropio;
+        }
+        else
+        {
+            simbolo = ".";
+            color = Colores.CasillaVacia;
         }
 
-        Console.Write($"{simbolo,2} ");
+        Console.ForegroundColor = color;
+        Console.Write($"{simbolo, 2} ");
+        Console.ResetColor();
     }
 
-    // Convertir fila y columna a coordenada humana
     private string ConvertirACoordenadaHumana(int fila, int columna)
     {
-        char letra = (char)('A' + fila);
-        return letra + (columna + 1).ToString();
+        char letra = (char)('A' + columna);
+        return letra + (fila + 1).ToString();
+    }
+
+    private string AjustarLineaMarco(string texto)
+    {
+        const int anchoInterior = 76;
+
+        if (texto.Length < anchoInterior + 1)
+        {
+            return texto.PadRight(anchoInterior + 1) + "║";
+        }
+
+        if (texto.Length == anchoInterior + 1)
+        {
+            return texto + "║";
+        }
+
+        return texto.Substring(0, anchoInterior + 1) + "║";
+    }
+
+    private string AjustarTextoColocacion(string texto, int ancho)
+    {
+        if (texto.Length > ancho)
+        {
+            return texto.Substring(0, ancho);
+        }
+
+        return texto.PadRight(ancho);
+    }
+
+    private string AjustarTextoDerecha(string texto, int ancho)
+    {
+        if (texto.Length > ancho)
+        {
+            return texto.Substring(0, ancho);
+        }
+
+        return texto.PadRight(ancho);
+    }
+
+    private string AjustarNumero(int numero, int espaciosDerecha)
+    {
+        return numero.ToString().PadRight(espaciosDerecha);
+    }
+
+    private void EscribirColor(string texto, ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+        Console.WriteLine(texto);
+        Console.ResetColor();
+    }
+
+    private void EscribirColorInline(string texto, ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+        Console.Write(texto);
+        Console.ResetColor();
+    }
+
+    private bool EsCasillaPreview(
+        int filaActual,
+        int columnaActual,
+        int filaPreview,
+        int columnaPreview,
+        int tamanio,
+        bool horizontal
+    )
+    {
+        if (filaPreview < 0 || columnaPreview < 0)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < tamanio; i++)
+        {
+            int filaBarco = horizontal ? filaPreview : filaPreview + i;
+            int columnaBarco = horizontal ? columnaPreview + i : columnaPreview;
+
+            if (filaActual == filaBarco && columnaActual == columnaBarco)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
-

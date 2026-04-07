@@ -30,7 +30,7 @@ public class Juego
 
     public void Iniciar()
     {
-        renderizador.MostrarBienvenida();
+        //renderizador.MostrarBienvenida();
 
         if (gestorGuardado.ExistePartidaGuardada)
         {
@@ -79,7 +79,7 @@ public class Juego
 
             while (!colocado)
             {
-                renderizador.MostrarTableroColocacion(jugador.Tablero, barco);
+                renderizador.MostrarTableroColocacion(jugador.Tablero, barco, -1, -1, true);
 
                 Console.Write("Introduce fila para " + barco.Nombre + " (0-9): ");
                 string? textoFila = Console.ReadLine();
@@ -126,6 +126,23 @@ public class Juego
                 else
                 {
                     renderizador.MostrarError("Orientación no válida.");
+                    continue;
+                }
+
+                // MOSTRAR PREVIEW
+                renderizador.MostrarTableroColocacion(
+                    jugador.Tablero,
+                    barco,
+                    fila,
+                    columna,
+                    esHorizontal
+                );
+
+                Console.Write("¿Confirmar posición? (S/N): ");
+                string? confirmar = Console.ReadLine();
+
+                if (confirmar == null || confirmar.Trim().ToUpper() != "S")
+                {
                     continue;
                 }
 
