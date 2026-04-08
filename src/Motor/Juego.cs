@@ -30,14 +30,13 @@ public class Juego
 
     public void Iniciar()
     {
-        //renderizador.MostrarBienvenida();
+        renderizador.MostrarBienvenida();
 
         if (gestorGuardado.ExistePartidaGuardada)
         {
-            Console.Write("¿Quieres continuar la partida guardada? (S/N): ");
-            string? respuesta = Console.ReadLine();
+            string respuesta = renderizador.PedirConfirmacionPartidaGuardada();
 
-            if (!string.IsNullOrWhiteSpace(respuesta) && respuesta.Trim().ToUpper() == "S")
+            if (respuesta == "S")
             {
                 CargarPartida();
             }
@@ -81,55 +80,10 @@ public class Juego
             {
                 renderizador.MostrarTableroColocacion(jugador.Tablero, barco, -1, -1, true);
 
-                Console.Write("Introduce fila para " + barco.Nombre + " (0-9): ");
-                string? textoFila = Console.ReadLine();
+                int fila = renderizador.PedirFilaBarco(barco);
+                int columna = renderizador.PedirColumnaBarco(barco);
+                bool esHorizontal = renderizador.PedirOrientacion();
 
-                Console.Write("Introduce columna para " + barco.Nombre + " (0-9): ");
-                string? textoColumna = Console.ReadLine();
-
-                Console.Write("Introduce orientación (H/V): ");
-                string? textoOrientacion = Console.ReadLine();
-
-                bool filaValida = int.TryParse(textoFila, out int fila);
-                bool columnaValida = int.TryParse(textoColumna, out int columna);
-
-                if (!filaValida || !columnaValida)
-                {
-                    renderizador.MostrarError("Posición no válida.");
-                    continue;
-                }
-
-                if (fila < 0 || fila > 9 || columna < 0 || columna > 9)
-                {
-                    renderizador.MostrarError("Posición fuera del tablero.");
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(textoOrientacion))
-                {
-                    renderizador.MostrarError("Orientación no válida.");
-                    continue;
-                }
-
-                textoOrientacion = textoOrientacion.Trim().ToUpper();
-
-                bool esHorizontal;
-
-                if (textoOrientacion == "H")
-                {
-                    esHorizontal = true;
-                }
-                else if (textoOrientacion == "V")
-                {
-                    esHorizontal = false;
-                }
-                else
-                {
-                    renderizador.MostrarError("Orientación no válida.");
-                    continue;
-                }
-
-                // MOSTRAR PREVIEW
                 renderizador.MostrarTableroColocacion(
                     jugador.Tablero,
                     barco,
@@ -138,10 +92,9 @@ public class Juego
                     esHorizontal
                 );
 
-                Console.Write("¿Confirmar posición? (S/N): ");
-                string? confirmar = Console.ReadLine();
+                bool confirmar = renderizador.PedirConfirmacionPosicion();
 
-                if (confirmar == null || confirmar.Trim().ToUpper() != "S")
+                if (!confirmar)
                 {
                     continue;
                 }
@@ -190,8 +143,7 @@ public class Juego
             renderizador.MostrarResultadoDisparo(resultado, fila, columna);
 
             GuardarPartida("Cpu");
-
-            break; // 🔥 CLAVE → sale del bucle SIEMPRE aquí
+            break;
         }
     }
 

@@ -11,6 +11,117 @@ public class Renderizador
         Console.WriteLine();
     }
 
+    public string PedirConfirmacionPartidaGuardada()
+    {
+        Console.Write("¿Quieres continuar la partida guardada? (S/N): ");
+        string? respuesta = Console.ReadLine();
+
+        if (respuesta == null)
+        {
+            return "";
+        }
+
+        return respuesta.Trim().ToUpper();
+    }
+
+    public int PedirFilaBarco(Barco barco)
+    {
+        while (true)
+        {
+            Console.Write("Introduce fila para " + barco.Nombre + " (A-J): ");
+            string? entrada = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(entrada))
+            {
+                MostrarError("Fila no válida.");
+                continue;
+            }
+
+            entrada = entrada.Trim().ToUpper();
+
+            if (entrada.Length != 1)
+            {
+                MostrarError("Fila no válida.");
+                continue;
+            }
+
+            char letra = entrada[0];
+
+            if (letra < 'A' || letra > 'J')
+            {
+                MostrarError("Fila no válida.");
+                continue;
+            }
+
+            return letra - 'A';
+        }
+    }
+
+    public int PedirColumnaBarco(Barco barco)
+    {
+        while (true)
+        {
+            Console.Write("Introduce columna para " + barco.Nombre + " (1-10): ");
+            string? entrada = Console.ReadLine();
+
+            if (!int.TryParse(entrada, out int columnaHumana))
+            {
+                MostrarError("Columna no válida.");
+                continue;
+            }
+
+            if (columnaHumana < 1 || columnaHumana > 10)
+            {
+                MostrarError("Columna no válida.");
+                continue;
+            }
+
+            return columnaHumana - 1;
+        }
+    }
+
+    public bool PedirOrientacion()
+    {
+        while (true)
+        {
+            Console.Write("Introduce orientación (H/V): ");
+            string? entrada = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(entrada))
+            {
+                MostrarError("Orientación no válida.");
+                continue;
+            }
+
+            entrada = entrada.Trim().ToUpper();
+
+            if (entrada == "H")
+            {
+                return true;
+            }
+
+            if (entrada == "V")
+            {
+                return false;
+            }
+
+            MostrarError("Orientación no válida.");
+        }
+    }
+
+    public bool PedirConfirmacionPosicion()
+    {
+        Console.Write("¿Confirmar posición? (S/N): ");
+        string? entrada = Console.ReadLine();
+
+        if (entrada == null)
+        {
+            return false;
+        }
+
+        return entrada.Trim().ToUpper() == "S";
+    }
+
     public void MostrarTablerosBatalla(Tablero propio, Tablero enemigo, Jugador jugador)
     {
         string[] letras = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
@@ -90,6 +201,7 @@ public class Renderizador
     )
     {
         string[] letras = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+
         bool posicionValida = false;
 
         if (filaPreview >= 0 && columnaPreview >= 0)
@@ -101,11 +213,11 @@ public class Renderizador
         Console.WriteLine(
             "║  Coloca tu "
                 + AjustarTextoColocacion(barco.Nombre + " (" + barco.Tamanio + " casillas)", 29)
-                + "║"
+                + "     ║"
         );
         Console.WriteLine("║  H = horizontal   V = vertical               ║");
         EscribirColor(ArteAscii.MarcoColocacionMedio, Colores.Titulo);
-        Console.WriteLine("║        1  2  3  4  5  6  7  8  9 10          ║");
+        Console.WriteLine("║      1  2  3  4  5  6  7  8  9 10            ║");
 
         for (int f = 0; f < 10; f++)
         {
@@ -133,7 +245,7 @@ public class Renderizador
                         Console.ForegroundColor = ConsoleColor.Red;
                     }
 
-                    Console.Write($"{"?", 2} ");
+                    Console.Write($"{'?',2} ");
                     Console.ResetColor();
                 }
                 else
@@ -142,22 +254,27 @@ public class Renderizador
                 }
             }
 
-            Console.WriteLine("║");
+            Console.WriteLine("         ║");
         }
 
         EscribirColor(ArteAscii.MarcoColocacionInferior, Colores.Titulo);
         Console.WriteLine();
-        Console.Write("? = posición provisional");
+        Console.Write("? = posición provisional   ");
 
-        if (posicionValida)
+        if (filaPreview >= 0 && columnaPreview >= 0)
         {
-            Console.Write("  ");
-            EscribirColor("Válida", ConsoleColor.Green);
+            if (posicionValida)
+            {
+                EscribirColor("Válida", ConsoleColor.Green);
+            }
+            else
+            {
+                EscribirColor("No válida", ConsoleColor.Red);
+            }
         }
         else
         {
-            Console.Write("  ");
-            EscribirColor("No válida", ConsoleColor.Red);
+            Console.WriteLine();
         }
 
         Console.WriteLine();
@@ -328,14 +445,42 @@ public class Renderizador
         }
 
         Console.ForegroundColor = color;
-        Console.Write($"{simbolo, 2} ");
+        Console.Write($"{simbolo,2} ");
         Console.ResetColor();
+    }
+
+    private bool EsCasillaPreview(
+        int filaActual,
+        int columnaActual,
+        int filaPreview,
+        int columnaPreview,
+        int tamanio,
+        bool horizontal
+    )
+    {
+        if (filaPreview < 0 || columnaPreview < 0)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < tamanio; i++)
+        {
+            int filaBarco = horizontal ? filaPreview : filaPreview + i;
+            int columnaBarco = horizontal ? columnaPreview + i : columnaPreview;
+
+            if (filaActual == filaBarco && columnaActual == columnaBarco)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private string ConvertirACoordenadaHumana(int fila, int columna)
     {
-        char letra = (char)('A' + columna);
-        return letra + (fila + 1).ToString();
+        char letra = (char)('A' + fila);
+        return letra + (columna + 1).ToString();
     }
 
     private string AjustarLineaMarco(string texto)
@@ -392,33 +537,5 @@ public class Renderizador
         Console.ForegroundColor = color;
         Console.Write(texto);
         Console.ResetColor();
-    }
-
-    private bool EsCasillaPreview(
-        int filaActual,
-        int columnaActual,
-        int filaPreview,
-        int columnaPreview,
-        int tamanio,
-        bool horizontal
-    )
-    {
-        if (filaPreview < 0 || columnaPreview < 0)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < tamanio; i++)
-        {
-            int filaBarco = horizontal ? filaPreview : filaPreview + i;
-            int columnaBarco = horizontal ? columnaPreview + i : columnaPreview;
-
-            if (filaActual == filaBarco && columnaActual == columnaBarco)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

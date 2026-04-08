@@ -11,19 +11,13 @@ public class Tablero
     // Comprobar si todos los barcos están hundidos
     public bool TodosHundidos
     {
-        get
-        {
-            return barcos.Count > 0 && barcos.All(b => b.EstaHundido);
-        }
+        get { return barcos.Count > 0 && barcos.All(b => b.EstaHundido); }
     }
 
     // Contar barcos que siguen a flote
     public int BarcosRestantes
     {
-        get
-        {
-            return barcos.Count(b => !b.EstaHundido);
-        }
+        get { return barcos.Count(b => !b.EstaHundido); }
     }
 
     // Inicializar tablero
@@ -47,22 +41,12 @@ public class Tablero
         return casillas[fila, columna];
     }
 
-    // Comprobar si un barco se puede colocar
     public bool PuedeColocar(Barco barco, int fila, int columna, bool esHorizontal)
     {
         for (int i = 0; i < barco.Tamanio; i++)
         {
-            int filaActual = fila;
-            int columnaActual = columna;
-
-            if (esHorizontal)
-            {
-                columnaActual += i;
-            }
-            else
-            {
-                filaActual += i;
-            }
+            int filaActual = esHorizontal ? fila : fila + i;
+            int columnaActual = esHorizontal ? columna + i : columna;
 
             if (filaActual < 0 || filaActual >= 10 || columnaActual < 0 || columnaActual >= 10)
             {
@@ -73,12 +57,9 @@ public class Tablero
             {
                 for (int c = columnaActual - 1; c <= columnaActual + 1; c++)
                 {
-                    if (f >= 0 && f < 10 && c >= 0 && c < 10)
+                    if (f >= 0 && f < 10 && c >= 0 && c < 10 && casillas[f, c].Barco != null)
                     {
-                        if (casillas[f, c].Barco != null)
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
             }

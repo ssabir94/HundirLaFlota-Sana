@@ -2,12 +2,12 @@
   "NombreJugador": "Jugador",
   "FaseActual": "Batalla",
   "TurnoActual": "Jugador",
-  "DisparosJugador": 4,
-  "AciertosJugador": 1,
-  "FallosJugador": 3,
-  "DisparosCpu": 4,
-  "AciertosCpu": 0,
-  "FallosCpu": 4,
+  "DisparosJugador": 15,
+  "AciertosJugador": 7,
+  "FallosJugador": 8,
+  "DisparosCpu": 15,
+  "AciertosCpu": 1,
+  "FallosCpu": 14,
   "BarcosJugador": [
     {
       "Nombre": "Portaaviones",
@@ -81,7 +81,7 @@
     {
       "Nombre": "Destructor",
       "Tamanio": 3,
-      "Impactos": 0,
+      "Impactos": 1,
       "Coordenadas": [
         {
           "Fila": 2,
@@ -117,7 +117,7 @@
     {
       "Nombre": "Acorazado",
       "Tamanio": 4,
-      "Impactos": 1,
+      "Impactos": 4,
       "Coordenadas": [
         {
           "Fila": 0,
@@ -182,7 +182,7 @@
     {
       "Nombre": "Submarino",
       "Tamanio": 3,
-      "Impactos": 0,
+      "Impactos": 3,
       "Coordenadas": [
         {
           "Fila": 4,
@@ -225,8 +225,58 @@
       "TeniaBarco": false
     },
     {
+      "Fila": 1,
+      "Columna": 3,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 1,
+      "Columna": 6,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 3,
+      "Columna": 0,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 3,
+      "Columna": 1,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 3,
+      "Columna": 3,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 4,
+      "Columna": 3,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 4,
+      "Columna": 6,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 4,
+      "Columna": 9,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 5,
+      "Columna": 6,
+      "TeniaBarco": false
+    },
+    {
       "Fila": 6,
       "Columna": 0,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 6,
+      "Columna": 1,
       "TeniaBarco": false
     },
     {
@@ -237,6 +287,11 @@
     {
       "Fila": 7,
       "Columna": 1,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 7,
+      "Columna": 6,
       "TeniaBarco": false
     }
   ],
@@ -257,9 +312,64 @@
       "TeniaBarco": false
     },
     {
+      "Fila": 0,
+      "Columna": 3,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 1,
+      "Columna": 3,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 2,
+      "Columna": 3,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 3,
+      "Columna": 0,
+      "TeniaBarco": false
+    },
+    {
       "Fila": 3,
       "Columna": 3,
       "TeniaBarco": true
+    },
+    {
+      "Fila": 4,
+      "Columna": 0,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 4,
+      "Columna": 3,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 5,
+      "Columna": 0,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 5,
+      "Columna": 1,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 6,
+      "Columna": 0,
+      "TeniaBarco": true
+    },
+    {
+      "Fila": 9,
+      "Columna": 8,
+      "TeniaBarco": false
+    },
+    {
+      "Fila": 9,
+      "Columna": 9,
+      "TeniaBarco": false
     }
   ],
   "Dificultad": "Normal"
