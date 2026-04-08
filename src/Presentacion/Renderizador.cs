@@ -11,6 +11,48 @@ public class Renderizador
         Console.WriteLine();
     }
 
+    public int MostrarMenuPrincipal(bool hayGuardado)
+    {
+        while (true)
+        {
+            EscribirColor(ArteAscii.LogoPrincipal, Colores.Titulo);
+
+            Console.WriteLine("1. Nueva partida");
+
+            if (hayGuardado)
+            {
+                Console.WriteLine("2. Continuar");
+            }
+            else
+            {
+                Console.WriteLine("2. Continuar (no disponible)");
+            }
+
+            Console.WriteLine("3. Récords");
+            Console.WriteLine("4. Salir");
+            Console.WriteLine();
+
+            Console.Write("Selecciona una opción: ");
+            string? entrada = Console.ReadLine();
+
+            if (int.TryParse(entrada, out int opcion))
+            {
+                if (opcion >= 1 && opcion <= 4)
+                {
+                    if (opcion == 2 && !hayGuardado)
+                    {
+                        MostrarError("No hay partida guardada.");
+                        continue;
+                    }
+
+                    return opcion;
+                }
+            }
+
+            MostrarError("Opción no válida.");
+        }
+    }
+
     public string PedirConfirmacionPartidaGuardada()
     {
         Console.Write("¿Quieres continuar la partida guardada? (S/N): ");
@@ -245,7 +287,7 @@ public class Renderizador
                         Console.ForegroundColor = ConsoleColor.Red;
                     }
 
-                    Console.Write($"{'?',2} ");
+                    Console.Write($"{'?', 2} ");
                     Console.ResetColor();
                 }
                 else
@@ -445,7 +487,7 @@ public class Renderizador
         }
 
         Console.ForegroundColor = color;
-        Console.Write($"{simbolo,2} ");
+        Console.Write($"{simbolo, 2} ");
         Console.ResetColor();
     }
 
@@ -537,5 +579,57 @@ public class Renderizador
         Console.ForegroundColor = color;
         Console.Write(texto);
         Console.ResetColor();
+    }
+
+    public void MostrarRecords(List<HundirLaFlota.Datos.EntradaMarcador> entradas)
+    {
+        EscribirColor(ArteAscii.LogoPrincipal, Colores.Titulo);
+        Console.WriteLine(
+            "╔════════════════════════════════════════════════════════════════════════════╗"
+        );
+        Console.WriteLine(
+            "║                                RÉCORDS                                     ║"
+        );
+        Console.WriteLine(
+            "╠════════════════════════════════════════════════════════════════════════════╣"
+        );
+
+        if (entradas.Count == 0)
+        {
+            Console.WriteLine(
+                "║  No hay puntuaciones guardadas todavía.                                   ║"
+            );
+        }
+        else
+        {
+            Console.WriteLine(
+                "║  #  Jugador              Disparos   Precisión   Puntuación                ║"
+            );
+            Console.WriteLine(
+                "╠════════════════════════════════════════════════════════════════════════════╣"
+            );
+
+            for (int i = 0; i < entradas.Count; i++)
+            {
+                string linea =
+                    "  "
+                    + (i + 1).ToString().PadRight(2)
+                    + " "
+                    + entradas[i].NombreJugador.PadRight(20)
+                    + " "
+                    + entradas[i].Disparos.ToString().PadRight(10)
+                    + " "
+                    + (entradas[i].Precision.ToString("F1") + " %").PadRight(11)
+                    + " "
+                    + entradas[i].Puntuacion.ToString("F2").PadRight(10);
+
+                Console.WriteLine("║" + linea.PadRight(76) + "║");
+            }
+        }
+
+        Console.WriteLine(
+            "╚════════════════════════════════════════════════════════════════════════════╝"
+        );
+        Console.WriteLine();
     }
 }

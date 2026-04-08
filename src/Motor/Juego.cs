@@ -17,6 +17,8 @@ public class Juego
     private Cpu cpu;
     private Renderizador renderizador;
     private GestorGuardado gestorGuardado;
+
+    private Marcador marcador;
     private Fase faseActual;
 
     public Juego()
@@ -25,35 +27,54 @@ public class Juego
         cpu = new Cpu("CPU");
         renderizador = new Renderizador();
         gestorGuardado = new GestorGuardado();
+        marcador = new Marcador();
         faseActual = Fase.Colocacion;
     }
 
     public void Iniciar()
     {
-        renderizador.MostrarBienvenida();
-
-        if (gestorGuardado.ExistePartidaGuardada)
+        while (true)
         {
-            string respuesta = renderizador.PedirConfirmacionPartidaGuardada();
+            int opcion = renderizador.MostrarMenuPrincipal(gestorGuardado.ExistePartidaGuardada);
 
-            if (respuesta == "S")
+            if (opcion == 1)
+            {
+                NuevaPartida();
+            }
+            else if (opcion == 2)
             {
                 CargarPartida();
+                EjecutarPartida();
+            }
+            else if (opcion == 3)
+            {
+                MostrarRecords();
+            }
+            else if (opcion == 4)
+            {
+                break;
             }
         }
+    }
 
-        if (faseActual == Fase.Colocacion)
-        {
-            List<Barco> flotaJugador = Flota.CrearFlota();
-            List<Barco> flotaCpu = Flota.CrearFlota();
+    private void NuevaPartida()
+    {
+        jugador = new Jugador("Jugador");
+        cpu = new Cpu("CPU");
 
-            ColocarFlotaJugador(flotaJugador);
-            cpu.ColocarFlotaAleatoria(flotaCpu);
+        List<Barco> flotaJugador = Flota.CrearFlota();
+        List<Barco> flotaCpu = Flota.CrearFlota();
 
-            faseActual = Fase.Batalla;
-            GuardarPartida("Jugador");
-        }
+        ColocarFlotaJugador(flotaJugador);
+        cpu.ColocarFlotaAleatoria(flotaCpu);
 
+        faseActual = Fase.Batalla;
+
+        EjecutarPartida();
+    }
+
+    private void EjecutarPartida()
+    {
         while (!HayGanador())
         {
             TurnoJugador();
@@ -177,7 +198,14 @@ public class Juego
     private void MostrarResultadoFinal()
     {
         bool ganaJugador = cpu.Tablero.TodosHundidos;
+
         renderizador.MostrarResultadoFinal(ganaJugador, jugador);
+
+        if (ganaJugador)
+        {
+            marcador.AgregarEntrada(jugador.Nombre, jugador.Disparos, jugador.Precision);
+        }
+
         gestorGuardado.EliminarGuardado();
     }
 
@@ -382,5 +410,11 @@ public class Juego
         }
 
         return true;
+    }
+
+    private void MostrarRecords()
+    {
+        List<EntradaMarcador> entradas = marcador.Cargar();
+        renderizador.MostrarRecords(entradas);
     }
 }
